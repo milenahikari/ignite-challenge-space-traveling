@@ -4,10 +4,7 @@ import Prismic from '@prismicio/client';
 import { format, parseISO } from 'date-fns';
 import ptBR from 'date-fns/locale/pt-BR';
 import Link from 'next/link';
-
 import Head from 'next/head';
-import Header from '../components/Header';
-
 import { FiCalendar, FiUser } from "react-icons/fi";
 
 import commonStyles from '../styles/common.module.scss';
@@ -38,7 +35,6 @@ export default function Home({ postsPagination }: HomeProps) {
       <Head>
         <title>Home | Space Travelling</title>
       </Head>
-      <Header />
 
       <main className={styles.contentContainer}>
         {postsPagination?.results?.map(post => (
