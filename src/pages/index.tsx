@@ -1,10 +1,12 @@
 import { GetStaticProps } from 'next';
 import { getPrismicClient } from '../services/prismic';
 import Prismic from '@prismicio/client';
-import { format, parseISO } from 'date-fns';
-import ptBR from 'date-fns/locale/pt-BR';
 import Link from 'next/link';
 import Head from 'next/head';
+
+import { format, parseISO } from 'date-fns';
+import ptBR from 'date-fns/locale/pt-BR';
+
 import { FiCalendar, FiUser } from "react-icons/fi";
 
 import commonStyles from '../styles/common.module.scss';
@@ -36,15 +38,15 @@ export default function Home({ postsPagination }: HomeProps) {
         <title>Home | Space Travelling</title>
       </Head>
 
-      <main className={styles.contentContainer}>
+      <main className={commonStyles.contentContainer}>
         {postsPagination?.results?.map(post => (
-          <section className={styles.post}>
+          <section key={post.uid} className={styles.post}>
             <Link href={`/post/${post.uid}`}>
-              <a key={post.uid} >
+              <a>
                 <h1>{post.data.title}</h1>
                 <p>{post.data.subtitle}</p>
 
-                <div className={styles.info}>
+                <div className={commonStyles.info}>
                   <div>
                     <FiCalendar color="#BBBBBB" />
                     <span>{post.first_publication_date}</span>
