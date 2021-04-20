@@ -55,6 +55,17 @@ export default function Post({ post }: PostProps) {
             <span>4 min</span>
           </div>
         </section>
+
+        {post.data.content.map(content => (
+          <section className={styles.content}>
+            <h2>{content.heading}</h2>
+            {/* {content.body.map(paragraph => (
+              <span>{paragraph}</span>
+              // <div dangerouslySetInnerHTML={{ __html:  }} />
+            ))} */}
+          </section>
+        ))}
+
       </article>
     </section>
   )
@@ -88,6 +99,8 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
   const prismic = getPrismicClient();
   const response = await prismic.getByUID('posts', String(slug), {});
 
+  console.log(JSON.stringify(response.data.content, null, 2));
+
   const post = {
     first_publication_date: format(
       parseISO(response.last_publication_date),
@@ -102,7 +115,9 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
       author: response.data.author,
       content: response.data.content.map(section => ({
         heading: section.heading,
-        body: RichText.asText(section.body)
+        // body: section.body.map(paragraph => ({
+        //   text: RichText.asText(paragraph)
+        // }))
       }))
     }
   };
