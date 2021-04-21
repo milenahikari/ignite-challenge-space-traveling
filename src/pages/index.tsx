@@ -12,6 +12,7 @@ import { FiCalendar, FiUser } from "react-icons/fi";
 
 import commonStyles from '../styles/common.module.scss';
 import styles from './home.module.scss';
+import Header from '../components/Header';
 
 interface Post {
   uid?: string;
@@ -67,6 +68,7 @@ export default function Home({ postsPagination }: HomeProps) {
         <title>Home | Space Travelling</title>
       </Head>
 
+      <Header />
       <main className={commonStyles.contentContainer}>
         {posts.map(post => (
           <section key={post.uid} className={styles.post}>
@@ -78,7 +80,11 @@ export default function Home({ postsPagination }: HomeProps) {
                 <div className={commonStyles.info}>
                   <div>
                     <FiCalendar color="#BBBBBB" />
-                    <span>{post.first_publication_date}</span>
+                    <span>{format(
+                      parseISO(post.first_publication_date),
+                      "dd MMM yyyy", {
+                      locale: ptBR,
+                    })}</span>
                   </div>
                   <div>
                     <FiUser color="#BBBBBB" />
@@ -113,11 +119,7 @@ export const getStaticProps: GetStaticProps = async () => {
 
   const posts = postsResponse.results.map(post => ({
     uid: post.uid,
-    first_publication_date: format(
-      parseISO(post.first_publication_date),
-      "dd MMM yyyy", {
-      locale: ptBR,
-    }),
+    first_publication_date: post.first_publication_date,
     data: {
       title: post.data.title,
       subtitle: post.data.subtitle,

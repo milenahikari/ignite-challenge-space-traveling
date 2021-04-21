@@ -12,6 +12,7 @@ import { FiCalendar, FiClock, FiUser } from 'react-icons/fi';
 
 import commonStyles from '../../styles/common.module.scss';
 import styles from './post.module.scss';
+import Header from '../../components/Header';
 
 interface Post {
   first_publication_date: string | null;
@@ -52,44 +53,51 @@ export default function Post({ post }: PostProps) {
       return acumulator + totalWordsHeading + totalWordsBody;
     }, 0);
 
-    return Math.round(totalWord / 200);
+    return Math.ceil(totalWord / 200);
   }, []);
 
   return (
-    <section className={styles.container}>
-      <img src={post.data.banner.url} alt={post.data.title} />
+    <>
+      <Header />
+      <section className={styles.container}>
+        <img src={post.data.banner.url} alt={post.data.title} />
 
-      <article className={`${commonStyles.contentContainer} ${styles.post}`}>
-        <h1>{post.data.title}</h1>
+        <article className={`${commonStyles.contentContainer} ${styles.post}`}>
+          <h1>{post.data.title}</h1>
 
-        <section className={commonStyles.info}>
-          <div>
-            <FiCalendar color="#BBBBBB" />
-            <span>{post.first_publication_date}</span>
-          </div>
-          <div>
-            <FiUser color="#BBBBBB" />
-            <span>{post.data.author}</span>
-          </div>
-          <div>
-            <FiClock color="#BBBBBB" />
-            <span>{minutes} min</span>
-          </div>
-        </section>
-
-        {post.data.content.map(content => (
-          <section key={post.data.title} className={styles.content}>
-            <h2>{content.heading}</h2>
-            <div
-              dangerouslySetInnerHTML={{
-                __html: RichText.asHtml(content.body),
-              }}
-            />
+          <section className={commonStyles.info}>
+            <div>
+              <FiCalendar color="#BBBBBB" />
+              <span>{format(
+                parseISO(post.first_publication_date),
+                "dd MMM yyyy", {
+                locale: ptBR,
+              })}</span>
+            </div>
+            <div>
+              <FiUser color="#BBBBBB" />
+              <span>{post.data.author}</span>
+            </div>
+            <div>
+              <FiClock color="#BBBBBB" />
+              <span>{minutes} min</span>
+            </div>
           </section>
-        ))}
 
-      </article>
-    </section>
+          {post.data.content.map(content => (
+            <section key={post.uid} className={styles.content}>
+              <h2>{content.heading}</h2>
+              <div
+                dangerouslySetInnerHTML={{
+                  __html: RichText.asHtml(content.body),
+                }}
+              />
+            </section>
+          ))}
+
+        </article>
+      </section>
+    </>
   )
 }
 
@@ -124,13 +132,11 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
   if (!response) return { notFound: true };
 
   const post = {
-    first_publication_date: format(
-      parseISO(response.first_publication_date),
-      "dd MMM yyyy", {
-      locale: ptBR,
-    }),
+    first_publication_date: response.first_publication_date,
+    uid: response.uid,
     data: {
       title: response.data.title,
+      subtitle: response.data.subtitle,
       banner: {
         url: response.data.banner.url,
       },
