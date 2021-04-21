@@ -78,7 +78,7 @@ export default function Post({ post }: PostProps) {
         </section>
 
         {post.data.content.map(content => (
-          <section className={styles.content}>
+          <section key={post.data.title} className={styles.content}>
             <h2>{content.heading}</h2>
             <div
               dangerouslySetInnerHTML={{
@@ -125,7 +125,7 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
 
   const post = {
     first_publication_date: format(
-      parseISO(response.last_publication_date),
+      parseISO(response.first_publication_date),
       "dd MMM yyyy", {
       locale: ptBR,
     }),
@@ -141,7 +141,8 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
 
   return {
     props: {
-      post
+      post,
+      revalidate: 60 * 60 // 1 hora
     }
   }
 };
