@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import Prismic from '@prismicio/client';
 import { GetStaticPaths, GetStaticProps } from 'next';
 import { getPrismicClient } from '../../services/prismic';
@@ -41,6 +41,20 @@ export default function Post({ post }: PostProps) {
     return <div className={commonStyles.contentContainer}>Carregando...</div>
   }
 
+  const minutes = useMemo(() => {
+    const totalWord = post.data.content.reduce((acumulator, current) => {
+      const wordsHeading = current.heading;
+      const totalWordsHeading = wordsHeading.split(' ').length;
+
+      const wordsBody = RichText.asText(current.body);
+      const totalWordsBody = wordsBody.split(' ').length;
+
+      return acumulator + totalWordsHeading + totalWordsBody;
+    }, 0);
+
+    return Math.round(totalWord / 200);
+  }, []);
+
   return (
     <section className={styles.container}>
       <img src={post.data.banner.url} alt={post.data.title} />
@@ -59,7 +73,7 @@ export default function Post({ post }: PostProps) {
           </div>
           <div>
             <FiClock color="#BBBBBB" />
-            <span>4 min</span>
+            <span>{minutes} min</span>
           </div>
         </section>
 
