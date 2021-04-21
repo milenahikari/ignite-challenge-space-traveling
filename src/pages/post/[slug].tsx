@@ -2,6 +2,8 @@ import React from 'react';
 import Prismic from '@prismicio/client';
 import { GetStaticPaths, GetStaticProps } from 'next';
 import { getPrismicClient } from '../../services/prismic';
+import { RichText } from 'prismic-dom';
+import { useRouter } from 'next/router';
 
 import { format, parseISO } from 'date-fns';
 import ptBR from 'date-fns/locale/pt-BR';
@@ -10,7 +12,6 @@ import { FiCalendar, FiClock, FiUser } from 'react-icons/fi';
 
 import commonStyles from '../../styles/common.module.scss';
 import styles from './post.module.scss';
-import { RichText } from 'prismic-dom';
 
 interface Post {
   first_publication_date: string | null;
@@ -34,6 +35,12 @@ interface PostProps {
 }
 
 export default function Post({ post }: PostProps) {
+  const router = useRouter();
+
+  if (router.isFallback) {
+    return <div className={commonStyles.contentContainer}>Carregando...</div>
+  }
+
   return (
     <section className={styles.container}>
       <img src={post.data.banner.url} alt={post.data.title} />
@@ -59,10 +66,11 @@ export default function Post({ post }: PostProps) {
         {post.data.content.map(content => (
           <section className={styles.content}>
             <h2>{content.heading}</h2>
-            {/* {content.body.map(paragraph => (
-              <span>{paragraph}</span>
-              // <div dangerouslySetInnerHTML={{ __html:  }} />
-            ))} */}
+            <div
+              dangerouslySetInnerHTML={{
+                __html: RichText.asHtml(content.body),
+              }}
+            />
           </section>
         ))}
 
@@ -99,7 +107,7 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
   const prismic = getPrismicClient();
   const response = await prismic.getByUID('posts', String(slug), {});
 
-  console.log(JSON.stringify(response.data.content, null, 2));
+  if (!response) return { notFound: true };
 
   const post = {
     first_publication_date: format(
@@ -113,12 +121,7 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
         url: response.data.banner.url,
       },
       author: response.data.author,
-      content: response.data.content.map(section => ({
-        heading: section.heading,
-        // body: section.body.map(paragraph => ({
-        //   text: RichText.asText(paragraph)
-        // }))
-      }))
+      content: response.data.content
     }
   };
 

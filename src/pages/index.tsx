@@ -75,7 +75,7 @@ export const getStaticProps: GetStaticProps = async () => {
   });
 
   const posts = postsResponse.results.map(post => ({
-    uid: post.slugs[0],
+    uid: post.uid,
     first_publication_date: format(
       parseISO(post.last_publication_date),
       "dd MMM yyyy", {
